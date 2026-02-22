@@ -1,0 +1,47 @@
+name: Create SpikeTracer Incident 
+enabled: true
+description: Creates a Jira Service Management incident using jira-connector and sends a Slack notification using slack-connector
+
+inputs:
+  - name: summary
+    type: string
+    default: SpikeTracer incident - root cause investigation
+
+  - name: description
+    type: string
+    default: |
+      Incident created by SpikeTracer.
+      Root cause and remediation suggestions to be filled by the agent.
+
+  - name: issueType
+    type: string
+    default: Incident   
+
+triggers:
+  - type: manual
+
+steps:
+  # Step 1 — Create Jira Incident
+  - name: create_incident
+    type: jira.pushToService
+    connector-id: 451d6a4e-1027-4d7d-9e70-e8064fc5a342
+    with:
+      incident:
+        summary: "{{ inputs.summary }}"
+        description: "{{ inputs.description }}"
+        issueType: "10054"
+
+  # Step 2 — Send Slack Notification
+  - name: notify_slack
+    type: slack
+    connector-id: 4d58f484-1138-4316-ac7d-399cb555d3d1
+    with:
+      message: |
+        🚨 *SpikeTracer Incident Created*
+
+        *Summary:* {{ inputs.summary }}
+        *Severity:* high
+
+        Incident successfully created in Jira.
+
+        _Generated automatically by SpikeTracer Agent_
