@@ -1,9 +1,16 @@
 import os
 import random
+import sys
 from datetime import datetime, timedelta, timezone
 
 from dotenv import load_dotenv
 from elasticsearch import Elasticsearch, helpers
+
+# Allow importing carbon_utils when running from repo root (python scripts/seed_demo_data.py)
+_scripts_dir = os.path.dirname(os.path.abspath(__file__))
+if _scripts_dir not in sys.path:
+    sys.path.insert(0, _scripts_dir)
+from carbon_utils import estimate_co2_grams_formula
 
 
 def get_es_client() -> Elasticsearch:
@@ -107,10 +114,16 @@ def create_indices(es: Elasticsearch) -> None:
 
 
 def generate_carbon_spike_data(base_time: datetime):
+    """
+    Generate carbon/metrics data for the demo.
+    Carbon (estimated_co2_grams) is computed from CPU% and region using
+    real grid intensity (see carbon_utils). Spike window still has higher CPU
+    so CO2 is higher; no synthetic random CO2.
+    """
     services = ["checkout", "payments", "inventory"]
     regions = ["us-central1", "europe-west1"]
 
-    # 2 hours before spike, 1 hour spike, 1 hour after
+    # 2 hours before spike, 1 hour spike, 1 hour after (5-min windows)
     docs = []
     for minutes_offset in range(-120, 120, 5):
         ts = base_time + timedelta(minutes=minutes_offset)
@@ -121,13 +134,13 @@ def generate_carbon_spike_data(base_time: datetime):
                 cpu = random.uniform(30, 60)
                 mem = random.uniform(40, 70)
                 rps = random.uniform(200, 400)
-                co2 = random.uniform(50, 90)
 
                 if is_spike_window:
                     cpu = random.uniform(80, 95)
                     mem = random.uniform(70, 90)
                     rps = random.uniform(400, 700)
-                    co2 = random.uniform(150, 250)
+
+                co2 = estimate_co2_grams_formula(cpu, region, window_minutes=5.0)
 
                 docs.append(
                     {
@@ -139,7 +152,7 @@ def generate_carbon_spike_data(base_time: datetime):
                             "cpu_pct": round(cpu, 2),
                             "memory_pct": round(mem, 2),
                             "requests_per_min": round(rps, 2),
-                            "estimated_co2_grams": round(co2, 2),
+                            "estimated_co2_grams": co2,
                             "deployment_id": "deploy-checkout-bad"
                             if is_spike_window
                             else "deploy-checkout-good",
