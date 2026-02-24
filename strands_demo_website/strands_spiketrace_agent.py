@@ -160,6 +160,3 @@ async def main() -> None:
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-# To test:
-# python strands_spiketrace_agent.py "Why did emissions spike in us-central1 in last 48 hours?"
