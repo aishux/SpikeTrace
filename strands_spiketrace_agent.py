@@ -32,6 +32,46 @@ def create_message(*, role: Role = Role.user, text: str, context_id=None) -> Mes
     )
 
 
+async def query_spiketrace_agent(question: str) -> str:
+    """
+    Send a question to the SpikeTrace A2A agent and return the full response text.
+    Uses env: SPIKETRACE_A2A_BASE, ELASTICSEARCH_API_KEY, SPIKETRACE_AGENT_ID.
+    """
+    load_dotenv()
+    a2a_base = os.getenv("SPIKETRACE_A2A_BASE")
+    api_key = os.getenv("ELASTICSEARCH_API_KEY")
+    agent_id = os.getenv("SPIKETRACE_AGENT_ID", "spiketrace")
+
+    if not a2a_base:
+        return "Error: SPIKETRACE_A2A_BASE is not set. Set it to your Kibana A2A base URL."
+    if not api_key:
+        return "Error: ELASTICSEARCH_API_KEY is not set."
+
+    custom_headers = {"Authorization": f"ApiKey {api_key}"}
+
+    async with httpx.AsyncClient(
+        timeout=DEFAULT_TIMEOUT, headers=custom_headers
+    ) as httpx_client:
+        resolver = A2ACardResolver(httpx_client=httpx_client, base_url=a2a_base.rstrip("/"))
+        agent_card = await resolver.get_agent_card(
+            relative_card_path=f"/{agent_id}.json"
+        )
+        config = ClientConfig(
+            httpx_client=httpx_client,
+            streaming=True,
+        )
+        factory = ClientFactory(config)
+        client = factory.create(agent_card)
+        msg = create_message(role=Role.user, text=question)
+        full_response = []
+        async for event in client.send_message(msg):
+            if isinstance(event, Message):
+                for part in event.parts:
+                    if isinstance(part.root, TextPart):
+                        full_response.append(part.root.text)
+        return "".join(full_response) if full_response else "No response from agent."
+
+
 async def main() -> None:
     load_dotenv()
 

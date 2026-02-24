@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
   <link href="css/styles.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <style>
     :root {
@@ -173,6 +174,36 @@
       line-height: 1.5;
       position: relative;
     }
+
+    /* Markdown-style formatting inside bot messages */
+    .message-bubble p { margin: 0 0 0.75em 0; }
+    .message-bubble p:last-child { margin-bottom: 0; }
+    .message-bubble strong { font-weight: 600; color: var(--text-primary); }
+    .message-bubble ul, .message-bubble ol {
+      margin: 0.5em 0 0.75em 1.25em;
+      padding-left: 1em;
+    }
+    .message-bubble li { margin-bottom: 0.35em; }
+    .message-bubble li::marker { color: var(--text-secondary); }
+    .message-bubble code {
+      background: rgba(0,0,0,0.06);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      font-size: 0.9em;
+      font-family: ui-monospace, monospace;
+    }
+    [data-theme="dark"] .message-bubble code {
+      background: rgba(255,255,255,0.12);
+    }
+    .message-bubble h1, .message-bubble h2, .message-bubble h3 {
+      margin: 1em 0 0.4em 0;
+      font-weight: 600;
+    }
+    .message-bubble h1 { font-size: 1.15em; }
+    .message-bubble h2 { font-size: 1.05em; }
+    .message-bubble h3 { font-size: 1em; }
+    .message-bubble > *:first-child { margin-top: 0; }
+    .message-bubble > *:last-child { margin-bottom: 0; }
 
     .bot-message .message-bubble {
       background-color: var(--bot-message-bg);
@@ -442,16 +473,32 @@
         '<i class="fas fa-moon"></i>';
     });
 
-    // Chat functionality
+    // Escape HTML for user messages (XSS safety)
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Render Markdown to HTML for bot messages; plain text for user
+    function formatMessageContent(content, isUser) {
+      if (!content) return '';
+      if (isUser) return escapeHtml(content);
+      if (typeof marked !== 'undefined') {
+        marked.setOptions({ breaks: true });
+        return marked.parse(content);
+      }
+      return escapeHtml(content);
+    }
+
     function createMessageElement(content, isUser = false) {
       const messageDiv = document.createElement('div');
       messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
-      
+      const safeContent = formatMessageContent(content, isUser);
       messageDiv.innerHTML = `
         <div class="avatar">${isUser ? 'U' : 'AI'}</div>
-        <div class="message-bubble">${content}</div>
+        <div class="message-bubble">${safeContent}</div>
       `;
-      
       return messageDiv;
     }
 
@@ -471,20 +518,41 @@
       typingIndicator.style.display = 'none';
     }
 
-    function simulateBotResponse(userMessage) {
+    const API_BASE = window.location.origin;
+
+    function isRateLimitError(detail) {
+      if (!detail || typeof detail !== 'string') return false;
+      return detail.includes('429') || detail.includes('RESOURCE_EXHAUSTED') || detail.includes('Resource exhausted');
+    }
+
+    async function sendToAgent(userMessage) {
       showTypingIndicator();
-      
-      // Simulate varying response times
-      setTimeout(() => {
+      try {
+        const res = await fetch(`${API_BASE}/api/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: userMessage }),
+        });
+        const data = await res.json();
         hideTypingIndicator();
-        const responses = [
-          "I understand you're asking about " + userMessage + ". Could you elaborate?",
-          "That's an interesting point about " + userMessage + ". Let me help you with that.",
-          "I've analyzed your message about " + userMessage + ". Here's what I think..."
-        ];
-        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-        addMessage(randomResponse);
-      }, Math.random() * 1000 + 1500);
+        if (!res.ok) {
+          const detail = data.detail || res.statusText;
+          if (res.status === 500 && isRateLimitError(detail)) {
+            addMessage('⚠️ The AI service is temporarily busy (rate limit). Please wait a minute and try again.');
+          } else {
+            addMessage('Error: ' + detail);
+          }
+          return;
+        }
+        if (data.response && isRateLimitError(data.response)) {
+          addMessage('⚠️ The AI service is temporarily busy (rate limit). Please wait a minute and try again.');
+          return;
+        }
+        addMessage(data.response || 'No response.');
+      } catch (err) {
+        hideTypingIndicator();
+        addMessage('Error: ' + (err.message || 'Could not reach the agent. Is the server running?'));
+      }
     }
 
     function handleSendMessage() {
@@ -492,7 +560,7 @@
       if (message) {
         addMessage(message, true);
         messageInput.value = '';
-        simulateBotResponse(message);
+        sendToAgent(message);
       }
     }
 
@@ -503,30 +571,10 @@
       }
     });
 
+    // Show welcome message on load
     setTimeout(() => {
-        const msg = addMessage("♻️ Hello! I'm your AI assistant. How can I help you today?");
-        
-      
-        // fallback inline styles in case your CSS didn't load
-        optionsContainer.style.display = "flex";
-        optionsContainer.style.gap = "10px";
-        optionsContainer.style.flexWrap = "nowrap";
-        optionsContainer.style.marginTop = "12px"; 
-      
-        options.forEach(pet => {
-          const btn = document.createElement("button");
-          btn.textContent = pet;
-          btn.className = "option-button";
-          btn.onclick = () => {
-            addMessage(pet, true);
-            addMessage(`Absolutely! How may I assist you with your ${pet.toLowerCase()} today?`);
-            optionsContainer.remove();
-          };
-          optionsContainer.appendChild(btn);
-        });
-      
-        bubble.appendChild(optionsContainer);
-      }, 500);      
+      addMessage("♻️ Hello! I'm your AI assistant. How can I help you today?");
+    }, 300);      
 
     const fileInput = document.getElementById('fileInput');
     const attachButton = document.getElementById('attachButton');
