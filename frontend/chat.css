@@ -1,0 +1,618 @@
+/* Import Google Font - Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+:root {
+    /* Dark mode colors */
+    --text-color: #E3E3E3;
+    --subheading-color: #828282;
+    --placeholder-color: #A6A6A6;
+    --primary-color: #242424;
+    --secondary-color: #383838;
+    --secondary-hover-color: #444;
+    --accent-color: #5350C4;
+}
+.light_mode {
+    /* Light mode colors */
+    --text-color: #222;
+    --subheading-color: #A0A0A0;
+    --placeholder-color: #6C6C6C;
+    --primary-color: #FFF;
+    --secondary-color: #E9EEF6;
+    --secondary-hover-color: #DBE1EA;
+}
+body {
+    background: var(--primary-color);
+}
+.header, .chat-list .message, .typing-form {
+    margin: 0 auto;
+    max-width: 980px;
+}
+.header {
+    margin-top: 6vh;
+    padding: 1rem;
+    overflow-x: hidden;
+}
+body.hide-header .header {
+    margin: 0;
+    display: none;
+}
+.header :where(.title, .subtitle) {
+    color: var(--text-color);
+    font-weight: 500;
+    line-height: 4rem;
+}
+.header .title {
+    width: fit-content;
+    font-size: 3rem;
+    background-clip: text;
+    background: linear-gradient(to right, #22c55e, #0ea5e9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.header .subtitle {
+    font-size: 2.6rem;
+    color: var(--subheading-color);
+}
+.suggestion-list {
+    width: 100%;
+    list-style: none;
+    display: flex;
+    gap: 1.25rem;
+    margin-top: 9.5vh;
+    overflow: hidden;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+.suggestion-list .suggestion {
+    cursor: pointer;
+    padding: 1.25rem;
+    width: 222px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    border-radius: 0.75rem;
+    justify-content: space-between;
+    background: var(--secondary-color);
+    transition: 0.2s ease;
+}
+.suggestion-list .suggestion:hover {
+    background: var(--secondary-hover-color);
+}
+.suggestion-list .suggestion :where(.text, .icon) {
+    font-weight: 400;
+    color: var(--text-color);
+}
+.suggestion-list .suggestion .icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    font-size: 1.3rem;
+    margin-top: 2.5rem;
+    align-self: flex-end;
+    align-items: center;
+    border-radius: 50%;
+    justify-content: center;
+    color: var(--text-color);
+    background: var(--primary-color);
+}
+.chat-list {
+    padding: 2rem 1rem 12rem;
+    max-height: 100vh;
+    overflow-y: auto;
+    scrollbar-color: #999 transparent;
+}
+.chat-list .message.incoming {
+    margin-top: 1.5rem;
+}
+.chat-list .message .message-content {
+    display: flex;
+    gap: 1.5rem;
+    width: 100%;
+    align-items: center;
+}
+.chat-list .message .text {
+    color: var(--text-color);
+    white-space: pre-wrap;
+}
+.chat-list .message.error .text {
+    color: #e55865;
+}
+.chat-list .message.loading .text {
+    display: none;
+}
+
+/* Avatar Styles */
+.chat-list .message .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--text-color);
+    background: var(--secondary-color); 
+}
+.chat-list .message.incoming .avatar {
+    background: linear-gradient(135deg, #22c55e, #0ea5e9); 
+    color: white;
+}
+.chat-list .message.outgoing .avatar {
+    background: var(--secondary-hover-color);
+}
+
+.chat-list .message .icon {
+    color: var(--text-color);
+    cursor: pointer;
+    height: 35px;
+    width: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    font-size: 1.25rem;
+    margin-left: 3.5rem;
+    visibility: hidden;
+}
+.chat-list .message .icon.hide {
+    visibility: hidden;
+}
+.chat-list .message:not(.loading, .error):hover .icon:not(.hide){
+    visibility: visible;
+}
+.chat-list .message .icon:hover {
+    background: var(--secondary-hover-color);
+}
+
+/* Smooth Bouncing Dots Animation */
+.chat-list .message .loading-indicator {
+    display: none;
+    gap: 6px;
+    padding: 10px 0;
+}
+.chat-list .message.loading .loading-indicator {
+    display: flex;
+}
+.chat-list .message .loading-indicator .dot {
+    height: 8px;
+    width: 8px;
+    background-color: var(--subheading-color);
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+.chat-list .message .loading-indicator .dot:nth-child(1) {
+    animation-delay: -0.32s;
+}
+.chat-list .message .loading-indicator .dot:nth-child(2) {
+    animation-delay: -0.16s;
+}
+@keyframes bounce {
+    0%, 80%, 100% { 
+        transform: scale(0);
+        opacity: 0.5;
+    } 
+    40% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.typing-area {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    padding: 1rem;
+    background: var(--primary-color);
+}
+.typing-area :where(.typing-form, .action-buttons) {
+    display: flex;
+    gap: 0.75rem;
+}
+.typing-form .input-wrapper {
+    width: 100%;
+    height: 56px;
+    display: flex;
+    position: relative;
+}
+.typing-form .typing-input {
+    height: 100%;
+    width: 100%;
+    border: none;
+    outline: none;
+    resize: none;
+    font-size: 1rem;
+    color: var(--text-color);
+    padding: 1.1rem 4rem 1.1rem 1.5rem;
+    border-radius: 100px;
+    background: var(--secondary-color);
+}
+.typing-form .typing-input:focus {
+    background: var(--secondary-hover-color);
+}
+.typing-form .typing-input::placeholder {
+    color: var(--placeholder-color);
+}
+.typing-area .icon {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    font-size: 1.4rem;
+    color: var(--text-color);
+    align-items: center;
+    justify-content: center;
+    background: var(--secondary-color);
+    transition: 0.2s ease;
+}
+.typing-area .icon:hover {
+    background: var(--secondary-hover-color);
+}
+.typing-form #send-message-button {
+    position: absolute;
+    right: 0;
+    outline: none;
+    border: none;
+    transform: scale(0);
+    background: transparent;
+    transition: transform 0.2s ease;
+}
+.typing-form .typing-input:valid ~ #send-message-button {
+    transform: scale(1);
+}
+.typing-area .disclaimer-text {
+    text-align: center;
+    font-size: 0.85rem;
+    margin-top: 1rem;
+    color: var(--placeholder-color);
+}
+@media (max-width: 768px) {
+    .header :is(.title, .subtitle) {
+        font-size: 2rem;
+        line-height: 2.6rem;
+    }
+    .header .subtitle {
+        font-size: 1.7rem;
+    }
+    .typing-area :where(.typing-form, .action-buttons) {
+        gap: 0.4rem;
+    }
+    .typing-form .input-wrapper {
+        height: 50px;
+    }
+    .typing-form .typing-input {
+        padding: 1.1rem 3.5rem 1.1rem 1.2rem;
+    }
+    .typing-area .icon {
+        height: 50px;
+        width: 50px;
+    }
+    .typing-area .disclaimer-text {
+        font-size: 0.75rem;
+        margin-top: 0.5rem;
+    }
+}
+
+/* Container for the generated image + download button */
+.chat-list .message .image-attachment-container {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 320px; /* Constrain width like Gemini/ChatGPT */
+}
+
+/* The generated image itself */
+.chat-list .message .image-attachment-container img {
+    width: 100%;           /* Fill the constrained container */
+    height: auto;
+    border-radius: 12px;
+    border: 1px solid var(--secondary-hover-color);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+/* Optional: subtle zoom on hover */
+.chat-list .message .image-attachment-container img:hover {
+    transform: scale(1.02);
+}
+
+
+/* Fix Markdown List Styles */
+.chat-list .message .text ul,
+.chat-list .message .text ol {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding-left: 1.5rem; /* Give space for the bullets */
+}
+
+.chat-list .message .text li {
+    margin-bottom: 0.25rem;
+    line-height: 1.6;
+}
+
+/* Ensure headings have breathing room */
+.chat-list .message .text h1,
+.chat-list .message .text h2,
+.chat-list .message .text h3,
+.chat-list .message .text h4 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+/* Remove top margin for the very first element so it aligns with avatar */
+.chat-list .message .text > *:first-child {
+    margin-top: 0;
+}
+
+/* ================= PREVIEW AREA ================= */
+.preview-container {
+    padding: 0 1rem 0.5rem 1rem;
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+    animation: fadeIn 0.3s ease;
+}
+
+.preview-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--secondary-color);
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--secondary-hover-color);
+    position: relative;
+    max-width: 100%;
+}
+
+/* Image Thumbnail */
+.preview-card img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 8px;
+    display: none; /* Hidden by default, shown via JS for images */
+}
+
+/* Generic Icon (for Audio/Video) */
+.preview-card .preview-icon {
+    font-size: 24px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--secondary-hover-color);
+    border-radius: 8px;
+    color: var(--text-color);
+}
+
+.preview-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.preview-info .file-name {
+    font-size: 0.85rem;
+    color: var(--text-color);
+    font-weight: 500;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.preview-info .file-type {
+    font-size: 0.7rem;
+    color: var(--subheading-color);
+}
+
+/* Close/Remove Button */
+#remove-file-btn {
+    background: var(--secondary-hover-color);
+    border: none;
+    color: var(--text-color);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    transition: background 0.2s;
+}
+
+#remove-file-btn:hover {
+    background: #ff5252;
+    color: white;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Ensure sending button is visible if file is attached (optional tweak) */
+.typing-form.has-file #send-message-button {
+    transform: scale(1);
+}
+
+/* ================= 1. CHAT HISTORY IMAGES ================= */
+/* Style for images sent BY the user inside the chat bubble */
+.message.outgoing .attachment-preview {
+    max-width: 200px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    cursor: zoom-in;
+    display: block;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ================= 2. FIX EXTRA SPACING ================= */
+/* ================= TEXT CONTENT & SPACING FIXES ================= */
+
+.chat-list .message .text {
+    color: var(--text-color);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    
+    /* 1. FORCE TEXT WRAPPING (Fixes "Out of Bounds" issue) */
+    width: 100%;
+    max-width: 100%;
+    white-space: pre-wrap;       /* Preserves Markdown formatting */
+    word-wrap: break-word;       /* Legacy fix */
+    overflow-wrap: break-word;   /* Standard fix for long words */
+    word-break: break-word;      /* Forces wrapping even on long strings */
+}
+
+/* 2. AGGRESSIVE MARGIN RESET (Fixes "Extra Spacing" issue) */
+/* Reset margins for all direct children to prevent stacking gaps */
+.chat-list .message .text > * {
+    margin-top: 0;
+    margin-bottom: 0.5rem; /* Consistent small gap between blocks */
+}
+
+/* Remove top margin from the very first element */
+.chat-list .message .text > *:first-child {
+    margin-top: 0 !important;
+}
+
+/* Remove bottom margin from the very last element */
+.chat-list .message .text > *:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Specific tweaks for Paragraphs */
+.chat-list .message .text p {
+    margin-bottom: 0.5rem;
+}
+
+/* Specific tweaks for Lists */
+.chat-list .message .text ul,
+.chat-list .message .text ol {
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
+    padding-left: 1.5rem; /* Ensure bullets stay visible inside the box */
+    list-style-position: outside; /* Keeps bullets aligned cleanly */
+}
+
+.chat-list .message .text li {
+    margin-bottom: 0.25rem; /* Tighter list items */
+}
+
+/* Headings (h1-h6) */
+.chat-list .message .text h1,
+.chat-list .message .text h2,
+.chat-list .message .text h3,
+.chat-list .message .text h4 {
+    margin-top: 1.25rem; /* Only add space ABOVE a new section */
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+/* ================= 4. FINAL SPACING FIX (Nested Elements) ================= */
+
+/* 1. Kill margins for paragraphs specifically INSIDE list items */
+/* This fixes the "double gap" between bullet points */
+.chat-list .message .text li p {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    display: inline-block; /* Ensures it sits nicely with the bullet */
+}
+
+/* 2. Fix the gap between the bullet point symbol and the text */
+/* Sometimes the text drops to a new line if the p tag is block-level */
+.chat-list .message .text li {
+    display: list-item; /* Enforces standard bullet behavior */
+    margin-bottom: 0.25rem; /* Only the necessary gap between items */
+}
+
+/* 3. Tighten the space between a Header/Paragraph and the List that follows it */
+.chat-list .message .text p + ul,
+.chat-list .message .text h1 + ul, 
+.chat-list .message .text h2 + ul, 
+.chat-list .message .text h3 + ul, 
+.chat-list .message .text h4 + ul {
+    margin-top: 0.25rem !important; /* Pulls the list up closer to its title */
+}
+
+/* 4. (Optional) Force bullet points to stick to the left */
+.chat-list .message .text ul,
+.chat-list .message .text ol {
+    padding-left: 1.2rem !important; /* Standard indentation */
+}
+
+/* ================= 3. LIGHTBOX (ZOOM) STYLES ================= */
+.lightbox-modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85); /* Dark dimming */
+    display: none; /* Hidden by default */
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.lightbox-modal.active {
+    display: flex;
+    opacity: 1;
+}
+
+.lightbox-image {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 8px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.lightbox-modal.active .lightbox-image {
+    transform: scale(1);
+}
+
+.close-lightbox {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 2.5rem;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.close-lightbox:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.message-content ul{
+    display: grid !important;
+}
