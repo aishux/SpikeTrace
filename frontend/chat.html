@@ -354,7 +354,7 @@
 </head>
 <body>
   <header>
-    <div class="banner">Because Every Pet Deserves Free Care.</div>
+    <div class="banner">Because every incident deserves instant clarity.</div>
     <nav>
           
         <div id="logo">
@@ -519,6 +519,8 @@
     }
 
     const API_BASE = window.location.origin;
+    /** Keep conversation context so the agent can use tools (e.g. create Jira ticket) when you say "yes". */
+    let chatContextId = null;
 
     function isRateLimitError(detail) {
       if (!detail || typeof detail !== 'string') return false;
@@ -528,10 +530,12 @@
     async function sendToAgent(userMessage) {
       showTypingIndicator();
       try {
+        const body = { message: userMessage };
+        if (chatContextId) body.context_id = chatContextId;
         const res = await fetch(`${API_BASE}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: userMessage }),
+          body: JSON.stringify(body),
         });
         const data = await res.json();
         hideTypingIndicator();
@@ -544,6 +548,7 @@
           }
           return;
         }
+        if (data.context_id) chatContextId = data.context_id;
         if (data.response && isRateLimitError(data.response)) {
           addMessage('⚠️ The AI service is temporarily busy (rate limit). Please wait a minute and try again.');
           return;

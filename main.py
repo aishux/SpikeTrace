@@ -26,21 +26,25 @@ frontend_path = os.path.join(os.path.dirname(__file__), "frontend")
 
 class ChatRequest(BaseModel):
     message: str
+    context_id: str | None = None  # Continue same conversation so agent can use tools (e.g. Jira/Slack)
 
 
 class ChatResponse(BaseModel):
     response: str
+    context_id: str | None = None  # Send this back on the next message in this chat
 
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
-    """Send user message to SpikeTrace agent and return the response."""
+    """Send user message to SpikeTrace agent and return the response. Pass context_id to keep conversation context (e.g. so 'yes' triggers create_incident_ticket)."""
     message = (request.message or "").strip()
     if not message:
         raise HTTPException(status_code=400, detail="Message cannot be empty")
     try:
-        response_text = await query_spiketrace_agent(message)
-        return ChatResponse(response=response_text)
+        response_text, context_id = await query_spiketrace_agent(
+            message, context_id=request.context_id
+        )
+        return ChatResponse(response=response_text, context_id=context_id)
     except Exception as e:
         raise HTTPException(
             status_code=500,

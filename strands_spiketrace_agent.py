@@ -16,7 +16,7 @@ from uuid import uuid4
 
 import httpx
 from a2a.client import A2ACardResolver, ClientConfig, ClientFactory
-from a2a.types import Message, Part, Role, TextPart
+from a2a.types import Message, Part, Role, Task, TextPart
 from dotenv import load_dotenv
 
 DEFAULT_TIMEOUT = 60  # seconds
@@ -32,9 +32,20 @@ def create_message(*, role: Role = Role.user, text: str, context_id=None) -> Mes
     )
 
 
-async def query_spiketrace_agent(question: str) -> str:
+def _text_from_message(msg: Message) -> str:
+    """Extract plain text from a Message's parts."""
+    parts = []
+    for part in msg.parts:
+        if isinstance(part.root, TextPart):
+            parts.append(part.root.text)
+    return "".join(parts)
+
+
+async def query_spiketrace_agent(question: str, context_id: str | None = None) -> tuple[str, str | None]:
     """
-    Send a question to the SpikeTrace A2A agent and return the full response text.
+    Send a question to the SpikeTrace A2A agent and return (response_text, context_id).
+    Pass context_id from a previous response to continue the same conversation so the
+    agent can use tools (e.g. create_incident_ticket) when you say "yes".
     Uses env: SPIKETRACE_A2A_BASE, ELASTICSEARCH_API_KEY, SPIKETRACE_AGENT_ID.
     """
     load_dotenv()
@@ -43,9 +54,9 @@ async def query_spiketrace_agent(question: str) -> str:
     agent_id = os.getenv("SPIKETRACE_AGENT_ID", "spiketrace")
 
     if not a2a_base:
-        return "Error: SPIKETRACE_A2A_BASE is not set. Set it to your Kibana A2A base URL."
+        return "Error: SPIKETRACE_A2A_BASE is not set. Set it to your Kibana A2A base URL.", None
     if not api_key:
-        return "Error: ELASTICSEARCH_API_KEY is not set."
+        return "Error: ELASTICSEARCH_API_KEY is not set.", None
 
     custom_headers = {"Authorization": f"ApiKey {api_key}"}
 
@@ -62,14 +73,31 @@ async def query_spiketrace_agent(question: str) -> str:
         )
         factory = ClientFactory(config)
         client = factory.create(agent_card)
-        msg = create_message(role=Role.user, text=question)
+        msg = create_message(role=Role.user, text=question, context_id=context_id)
         full_response = []
+        out_context_id: str | None = context_id
+        last_task: Task | None = None
         async for event in client.send_message(msg):
             if isinstance(event, Message):
-                for part in event.parts:
-                    if isinstance(part.root, TextPart):
-                        full_response.append(part.root.text)
-        return "".join(full_response) if full_response else "No response from agent."
+                out_context_id = getattr(event, "context_id", None) or out_context_id
+                full_response.append(_text_from_message(event))
+            elif isinstance(event, tuple) and len(event) >= 1:
+                task = event[0]
+                if isinstance(task, Task):
+                    last_task = task
+                    out_context_id = task.context_id
+        if full_response:
+            text = "".join(full_response)
+        elif last_task and last_task.history:
+            assistant_text = [
+                _text_from_message(m)
+                for m in last_task.history
+                if getattr(m, "role", None) in ("agent", "assistant")
+            ]
+            text = "".join(assistant_text) if assistant_text else "No response from agent."
+        else:
+            text = "No response from agent."
+        return text, out_context_id
 
 
 async def main() -> None:
