@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpikeTrace Ai - Home</title>
+    <!-- CSS + Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    #utility {
+      display: flex;
+      gap: 15px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    main {
+      padding: 20px 20px;
+      margin: auto;
+    }
+    .pet-selector {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    select {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 25px;
+    }
+    .chart-card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .chart-card canvas {
+    max-height: 300px;   /* limit all charts */
+    }
+    
+    .chart-card.pie canvas {
+    max-width: 300px;    /* keep pie smaller */
+    margin: auto;        /* center it */
+    }
+      
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="banner">Because Every Pet Deserves Free Care.</div>
+    <nav>
+          
+        <div id="logo">
+            <img src="images/logo.png" alt="SpikeTrace AI Logo" width="140" height="132">
+        </div>
+        <ul class="navigation-menu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="chat.html">SpikeTrace Agent</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+        </ul>
+        <div id="utility">
+            <a href="login.html" class="tooltip">
+              <span class="material-symbols-outlined">logout</span>
+              <span class="tooltip-text">Logout</span>
+            </a>
+        </div>          
+    </nav>
+</header>
+
+  <!-- Main -->
+  <main>
+    <div class="pet-selector">
+      <label for="petSelect">Select Pet: </label>
+      <select id="petSelect">
+        <option>Buddy (Dog)</option>
+        <option>Whiskers (Cat)</option>
+        <option>Poppy (Bird)</option>
+        <option>Goldie (Hamster)</option>
+      </select>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3>Activity Levels</h3>
+        <canvas id="barChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Heart Rate Trend</h3>
+        <canvas id="lineChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Diet Breakdown</h3>
+        <canvas id="pieChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Overall Vitals</h3>
+        <canvas id="radarChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Activity Levels</h3>
+        <canvas id="barChart2"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Activity Levels</h3>
+        <canvas id="bubbleChart"></canvas>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <ul>
+      Features
+      <li><a href="index.html">Home</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="chat.html">SpikeTrace Agent</a></li>
+    </ul>
+  
+    <ul>
+      Resources
+      <li><a href="#">Blog</a></li>
+      <li><a href="#">FAQs</a></li>
+      <li><a href="#">Support</a></li>
+    </ul>
+  
+    <ul>
+      Account
+      <li><a href="login.html">Login</a></li>
+      <li><a href="login.html">Signup</a></li>
+    </ul>
+  
+    <ul>
+      Company
+      <li><a href="#">About Us</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+  
+  </footer>
+
+  <!-- Chart Scripts -->
+  <script>
+    // Bar Chart
+    new Chart(document.getElementById("barChart"), {
+      type: "bar",
+      data: {
+        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        datasets: [{
+          label: "Activity",
+          data: [12, 19, 8, 15, 22, 30, 18],
+          backgroundColor: "#C5D89D"
+        }]
+      }
+    });
+
+    // Line Chart
+    new Chart(document.getElementById("lineChart"), {
+      type: "line",
+      data: {
+        labels: ["6 AM", "9 AM", "12 PM", "3 PM", "6 PM", "9 PM"],
+        datasets: [{
+          label: "Heart Rate",
+          data: [80, 95, 100, 85, 90, 75],
+          borderColor: "#C5D89D",
+          fill: false
+        }]
+      }
+    });
+
+    // Pie Chart
+    new Chart(document.getElementById("pieChart"), {
+      type: "pie",
+      data: {
+        labels: ["Protein", "Carbs", "Fats"],
+        datasets: [{
+          data: [50, 30, 20],
+          backgroundColor: ["#C5D89D", "#9CAB84", "#89986D"]
+        }]
+      }
+    });
+
+    // Radar Chart
+    new Chart(document.getElementById("radarChart"), {
+      type: "radar",
+      data: {
+        labels: ["Energy", "Sleep", "Hydration", "Playfulness", "Calmness"],
+        datasets: [{
+          label: "Vitals",
+          data: [8, 6, 7, 9, 5],
+          backgroundColor: "#F6F0D7",
+          borderColor: "#C5D89D"
+        }]
+      }
+    });
+
+    // Bar Chart
+    new Chart(document.getElementById("barChart2"), {
+        type: "bar",
+        data: {
+          labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+          datasets: [{
+            label: "Activity",
+            data: [12, 19, 8, 15, 22, 30, 18],
+            backgroundColor: "#C5D89D"
+          }]
+        }
+      });
+
+    // Bubble Chart
+    new Chart(document.getElementById('bubbleChart'), {
+        type: 'bubble',
+        data: {
+        datasets: [{
+            label: 'Activity Levels',
+            data: [
+            {x: 10, y: 20, r: 15},
+            {x: 15, y: 10, r: 10},
+            {x: 25, y: 8, r: 12},
+            {x: 32, y: 18, r: 9}
+            ],
+            backgroundColor: '#C5D89D'
+        }]
+        },
+        options: { responsive: true }
+    });
+  
+
+  </script>
+</body>
+</html>

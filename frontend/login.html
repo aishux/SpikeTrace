@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpikeTrace - Login / Sign Up</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --text-01: #89986D;
+      --light-01: #F9F9F9;
+      --light-02: #FFFFFF;
+      --brand-01: #9CAB84;
+      --brand-02: #F6F0D7;
+      --card-hover: 0px 4px 24px rgba(0, 0, 0, 0.15);
+      --hover-timing: all 0.3s ease;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--light-01);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    /* Container */
+    .user {
+      width: 900px;
+      height: 550px;
+      display: flex;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--card-hover);
+      background: var(--light-02);
+    }
+
+    /* Left side text panels */
+    .user_options-text {
+      width: 40%;
+      background: var(--brand-01);
+      color: var(--light-01);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .user_options-text h2 {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+
+    .user_options-text p {
+      font-size: 14px;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .user_options-text button {
+      background: var(--light-01);
+      color: var(--brand-01);
+      font-weight: 600;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 48px;
+      cursor: pointer;
+      transition: var(--hover-timing);
+    }
+
+    .user_options-text button:hover {
+      background: var(--brand-02);
+      color: var(--text-01);
+    }
+
+    /* Forms container */
+    .user_options-forms {
+      width: 60%;
+      position: relative;
+      overflow: hidden;
+      background: var(--light-02);
+    }
+
+    .user_forms-login,
+    .user_forms-signup {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      padding: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      transition: transform 0.6s ease-in-out;
+    }
+
+    .user_forms-login {
+      transform: translateX(0);
+    }
+
+    .user_forms-signup {
+      transform: translateX(100%);
+    }
+
+    .user_options-forms.bounceLeft .user_forms-login {
+      transform: translateX(-100%);
+    }
+    .user_options-forms.bounceLeft .user_forms-signup {
+      transform: translateX(0);
+    }
+    .user_options-forms.bounceRight .user_forms-login {
+      transform: translateX(0);
+    }
+    .user_options-forms.bounceRight .user_forms-signup {
+      transform: translateX(100%);
+    }
+
+    .forms_title {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--text-01);
+      margin-bottom: 24px;
+    }
+
+    .forms_field input {
+      width: 100%;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+      outline: none;
+      transition: var(--hover-timing);
+    }
+
+    .forms_field input:focus {
+      border-color: var(--brand-01);
+      box-shadow: 0px 0px 6px rgba(219, 127, 103, 0.4);
+    }
+
+    .forms_buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .forms_buttons-forgot {
+      background: none;
+      border: none;
+      font-size: 14px;
+      color: var(--brand-01);
+      cursor: pointer;
+    }
+
+    .forms_buttons-action {
+      background: var(--brand-01);
+      color: var(--light-01);
+      border: none;
+      border-radius: 48px;
+      padding: 10px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--hover-timing);
+    }
+
+    .forms_buttons-action:hover {
+      background: var(--text-01);
+    }
+  </style>
+</head>
+<body>
+
+<section class="user">
+  <!-- Left side -->
+  <div class="user_options-text">
+    <div class="user_options-unregistered">
+      <h2>Get Started</h2>
+      <p>Join SpikeTrace today and track your pet's health effortlessly.</p>
+      <button id="signup-button">Sign up</button>
+      <button id="login-button">Login</button>
+    </div>
+  </div>
+
+  <!-- Forms -->
+  <div class="user_options-forms bounceRight" id="user_options-forms">
+    <!-- Login -->
+    <div class="user_forms-login">
+      <h2 class="forms_title">Login</h2>
+      <form class="forms_form">
+        <div class="forms_field">
+          <input type="email" placeholder="Email" required autofocus />
+        </div>
+        <div class="forms_field">
+          <input type="password" placeholder="Password" required />
+        </div>
+        <div class="forms_buttons">
+          <button type="button" class="forms_buttons-forgot">Forgot password?</button>
+          <input type="submit" value="Log In" class="forms_buttons-action">
+        </div>
+      </form>
+    </div>
+
+    <!-- Sign Up -->
+    <div class="user_forms-signup">
+      <h2 class="forms_title">Sign Up</h2>
+      <form class="forms_form">
+        <div class="forms_field">
+          <input type="text" placeholder="Full Name" required />
+        </div>
+        <div class="forms_field">
+          <input type="email" placeholder="Email" required />
+        </div>
+        <div class="forms_field">
+          <input type="password" placeholder="Password" required />
+        </div>
+        <div class="forms_buttons">
+          <input type="submit" value="Sign up" class="forms_buttons-action">
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+  const signupButton = document.getElementById('signup-button'),
+        loginButton = document.getElementById('login-button'),
+        userForms = document.getElementById('user_options-forms');
+
+  signupButton.addEventListener('click', () => {
+    userForms.classList.remove('bounceRight');
+    userForms.classList.add('bounceLeft');
+  }, false);
+
+  loginButton.addEventListener('click', () => {
+    userForms.classList.remove('bounceLeft');
+    userForms.classList.add('bounceRight');
+  }, false);
+</script>
+
+</body>
+</html>

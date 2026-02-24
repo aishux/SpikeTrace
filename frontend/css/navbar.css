@@ -1,0 +1,29 @@
+:root{
+    --primary:#ff9a9e;
+    --secondary:#fad0c4;
+  }
+  *{box-sizing:border-box}
+  body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    background: #f9f9f9;
+    color: #333;
+  }
+  
+  /* NAVBAR */
+  .navbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:16px 28px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color:#fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  .navbar-logo{ font-weight:800; font-size:1.25rem; color:white; text-decoration:none; }
+  .navbar-links { display:flex; gap:18px; }
+  .navbar-links a { color:white; text-decoration:none; font-weight:600; }
+  

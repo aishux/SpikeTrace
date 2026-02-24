@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpikeTrace - Observability Copilot</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link href="css/styles.css" rel="stylesheet">
+<body>
+<header>
+    <div class="banner">Because every incident deserves instant clarity.</div>
+    <nav>
+          
+        <div id="logo">
+            <img src="images/logo.png" alt="SpikeTrace Logo" width="140" height="132">
+        </div>
+        <ul class="navigation-menu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="chat.html">SpikeTrace Agent</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+        </ul>
+        <div id="utility">
+            <a href="login.html" class="tooltip">
+              <span class="material-symbols-outlined">logout</span>
+              <span class="tooltip-text">Logout</span>
+            </a>
+        </div>          
+    </nav>
+</header>
+<section class="hero">
+    <h1>AI-First Analytics for Spikes, Outages & Anomalies.</h1>
+    <div class="btn-group">
+        <button class="btn-filled-dark" onclick="window.location.href='chat.html'">
+            <span class="material-symbols-outlined">explore</span> Open SpikeTrace Agent
+          </button>          
+            <button class="btn-outline-dark btn-hover-color" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})">
+                <span class="material-symbols-outlined">search</span> View Capabilities
+              </button>
+              
+    </div>
+
+</section>
+<!-- A Deeper Look Section -->
+<section class="px-8 py-16 text-center">
+    <h2 class="text-3xl font-bold mb-4">Why SpikeTrace</h2>
+    <p class="text-gray-600 max-w-3xl mx-auto mb-12">
+        SpikeTrace is your AI-native observability copilot. It connects to your logs, metrics, and traces to explain why that spike happened, which services are impacted, and what changed right before the incident. With natural language search, elastic-native analytics, and guided workflows, SpikeTrace helps SREs, developers, and analysts move from dashboards to answers in seconds.
+    </p>
+    
+    
+    <div class="grid md:grid-cols-3 gap-12">
+    <!-- Data Collection -->
+    <div class="flex flex-col items-center" style="margin-top: -190px;">
+        <div class="card-image"><img src="images/data.png" style="width:250px; height:200px; display:block; margin-bottom:-200px;"></div>
+    <h3 class="text-xl font-bold mb-2">1. Unified Telemetry</h3>
+    <p class="text-gray-600">
+        Ingest logs, metrics, traces, and alerts from your existing stack into a single elastic-native workspace.
+    </p>
+    </div>
+    
+    
+    <!-- Veterinary Labeling -->
+    <div class="flex flex-col items-center" style="margin-top: -190px;">
+        <div class="card-image"><img src="images/robot.png" style="width:250px; height:200px; display:block; margin-bottom:-200px;"></div>
+    <h3 class="text-xl font-bold mb-2">2. AI Root-Cause Analysis</h3>
+    <p class="text-gray-600">
+        Let SpikeTrace correlate anomalies across services, deployments, and infrastructure to surface likely root causes.
+    </p>
+    </div>
+    
+    
+    <!-- Continuous Learning -->
+    <div class="flex flex-col items-center" style="margin-top: -190px;">
+        <div class="card-image"><img src="images/learn.png" style="width:250px; height:200px; display:block; margin-bottom:-200px;"></div>
+    <h3 class="text-xl font-bold mb-2">3. Continuous Learning</h3>
+    <p class="text-gray-600">
+        SpikeTrace learns from every incident, alert, and query to refine patterns and recommendations over time.
+    </p>
+    </div>
+    </div>
+    </section>
+
+<section id="locate">
+
+    <div>
+        <h2>Our Philosophy</h2>
+        <p>At SpikeTrace, we believe observability should start with questions, not dashboards. Our mission is to turn raw telemetry into guided, conversational workflows that help you understand what changed, what broke, and what to do next — all powered by Elastic-native AI.</p>
+        <div class="btn-group">
+            <button class="btn-outline-dark btn-hover-color" onclick="window.location.href='chat.html'"><span class="material-symbols-outlined">
+contact_support
+</span> Talk to SpikeTrace Agent</button>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <ul>
+      SpikeTrace
+      <li><a href="index.html">Home</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="chat.html">SpikeTrace Agent</a></li>
+    </ul>
+  
+    <ul>
+      Resources
+      <li><a href="#">Docs</a></li>
+      <li><a href="#">Playbooks</a></li>
+      <li><a href="#">Changelog</a></li>
+    </ul>
+  
+    <ul>
+      Account
+      <li><a href="login.html">Login</a></li>
+      <li><a href="login.html">Signup</a></li>
+    </ul>
+  
+    <ul>
+      Company
+      <li><a href="#">Elastic Hackathon Project</a></li>
+      <li><a href="#">Contact Team SpikeTrace</a></li>
+    </ul>
+  
+  </footer>
+  
+</body>
+</html>
