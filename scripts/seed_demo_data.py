@@ -49,10 +49,12 @@ def create_indices(es: Elasticsearch) -> None:
                     "@timestamp": {"type": "date"},
                     "service": {"type": "keyword"},
                     "region": {"type": "keyword"},
+                    "cloud.provider": {"type": "keyword"},
                     "cpu_pct": {"type": "float"},
                     "memory_pct": {"type": "float"},
                     "requests_per_min": {"type": "float"},
                     "estimated_co2_grams": {"type": "float"},
+                    "emissions_kg_co2e": {"type": "float"},
                     "deployment_id": {"type": "keyword"},
                 }
             },
@@ -141,6 +143,7 @@ def generate_carbon_spike_data(base_time: datetime):
                     rps = random.uniform(400, 700)
 
                 co2 = estimate_co2_grams_formula(cpu, region, window_minutes=5.0)
+                emissions_kg = co2 / 1000.0
 
                 docs.append(
                     {
@@ -149,10 +152,12 @@ def generate_carbon_spike_data(base_time: datetime):
                             "@timestamp": ts.isoformat(),
                             "service": service,
                             "region": region,
+                            "cloud.provider": "gcp",
                             "cpu_pct": round(cpu, 2),
                             "memory_pct": round(mem, 2),
                             "requests_per_min": round(rps, 2),
                             "estimated_co2_grams": co2,
+                            "emissions_kg_co2e": emissions_kg,
                             "deployment_id": "deploy-checkout-bad"
                             if is_spike_window
                             else "deploy-checkout-good",
@@ -283,7 +288,9 @@ def main():
     es = get_es_client()
     create_indices(es)
 
-    base_time = datetime.now(timezone.utc) - timedelta(hours=3)
+    # Center the synthetic spike close to \"now\" so it shows up in
+    # default Kibana time ranges like \"Last 15 minutes\" or \"Last 1 hour\".
+    base_time = datetime.now(timezone.utc) - timedelta(hours=1)
 
     carbon_docs = generate_carbon_spike_data(base_time)
     log_docs, deployment_docs = generate_logs_and_deployments(base_time)
