@@ -36,8 +36,10 @@ def estimate_co2_grams_formula(cpu_pct: float, region: str, window_minutes: floa
     if window_minutes <= 0 or cpu_pct <= 0:
         return 0.0
 
-    # Very rough power model: assume a single virtual CPU with ~50W at 100% load.
-    watts_at_full_load = 50.0
+    # Very rough power model scaled up to represent many CPUs/pods in a fleet,
+    # so demo emissions land in the tens–hundreds of kg instead of tiny fractions.
+    # Conceptually this is like aggregating over a large cluster, not a single core.
+    watts_at_full_load = 50000.0
     utilization = max(0.0, min(cpu_pct, 100.0)) / 100.0
 
     # Watt-hours consumed over the window.
