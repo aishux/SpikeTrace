@@ -474,9 +474,11 @@ def generate_incidents():
             "revenue_lost_usd": 850 * 85.0,
         },
         {
-            "relative_time": timedelta(days=60),
-            "title": "Excess compute waste from error loop in payments",
-            "summary": "Payments service entered an error loop due to a bad feature flag, causing intermittent card declines and retries for users and wasting CPU.",
+            # Payments incident intentionally kept within the last 7 days so
+            # business-impact queries over that window return concrete numbers.
+            "relative_time": timedelta(days=3),
+            "title": "Third-party payments gateway outage in europe-west1",
+            "summary": "Payments service entered an error loop due to a bad feature flag and third-party gateway issues, causing intermittent card declines and retries for users and wasting CPU.",
             "service": "payments",
             "region": "europe-west1",
             "tags": ["waste", "errors", "payments"],
@@ -627,6 +629,101 @@ def generate_incidents():
                 },
             }
         )
+
+    # Systematic daily incidents for the last 30 days so that
+    # time-windowed questions (e.g. "last 7 days", "last 30 days")
+    # always have concrete business and carbon impact to reference.
+    for days_ago in range(0, 30):
+        for service, region in [
+            ("checkout", "us-central1"),
+            ("payments", "europe-west1"),
+            ("inventory", "europe-west1"),
+        ]:
+            ts = now - timedelta(
+                days=days_ago,
+                hours=random.randint(0, 23),
+                minutes=random.randint(0, 59),
+            )
+            severity = random.choices(severities, weights=[1, 2, 3, 1])[0]
+            status = random.choice(statuses)
+            duration = random.uniform(20.0, 180.0)
+
+            extra_cpu_pct = random.uniform(10.0, 60.0)
+            wasted_co2 = estimate_co2_grams_formula(
+                cpu_pct=extra_cpu_pct,
+                region=region,
+                window_minutes=duration,
+            )
+            wasted_kg = wasted_co2 / 1000.0
+
+            severity_multiplier = {
+                "low": 0.3,
+                "medium": 0.6,
+                "high": 1.0,
+                "critical": 1.5,
+            }.get(severity, 0.5)
+            orders_affected = int(
+                (duration * 5.0 / 60.0)
+                * severity_multiplier
+                * random.uniform(0.8, 1.4)
+            )
+            avg_order_value_usd = {
+                "checkout": 85.0,
+                "payments": 95.0,
+                "inventory": 60.0,
+            }.get(service, 80.0)
+            revenue_lost = float(orders_affected) * avg_order_value_usd
+
+            # Ensure that the "current" checkout incident in us-central1
+            # (days_ago == 0) is large enough to look meaningful in demos,
+            # instead of a tiny single-order blip.
+            if days_ago == 0 and service == "checkout" and region == "us-central1":
+                orders_affected = random.randint(120, 400)
+                revenue_lost = float(orders_affected) * avg_order_value_usd
+
+            if service == "checkout":
+                title = f"Checkout instability impacting orders in {region}"
+                summary = (
+                    f"Intermittent checkout failures in {region} caused users to abandon carts, "
+                    f"leading to lost orders and excess retries."
+                )
+                tags = ["checkout", "errors", "carbon", "retries"]
+            elif service == "payments":
+                title = f"Payments gateway issues in {region} affecting transactions"
+                summary = (
+                    f"Third-party gateway issues in {region} led to declined or delayed card payments, "
+                    f"hurting conversion and wasting compute."
+                )
+                tags = ["payments", "gateway", "errors", "carbon"]
+            else:
+                title = f"Inventory consistency problems in {region}"
+                summary = (
+                    f"Inventory replication or consistency issues in {region} caused users to see stale or incorrect stock, "
+                    f"triggering retries and avoidable emissions."
+                )
+                tags = ["inventory", "consistency", "errors", "carbon"]
+
+            docs.append(
+                {
+                    "_index": base_index,
+                    "_source": {
+                        "@timestamp": ts.isoformat(),
+                        "title": title,
+                        "summary": summary,
+                        "service": service,
+                        "region": region,
+                        "tags": tags,
+                        "severity": severity,
+                        "status": status,
+                        "duration_minutes": duration,
+                        "orders_affected": orders_affected,
+                        "revenue_lost_usd": revenue_lost,
+                        "wasted_co2_grams": wasted_co2,
+                        "wasted_emissions_kg_co2e": wasted_kg,
+                        "embedding": random_embedding(),
+                    },
+                }
+            )
 
     return docs
 

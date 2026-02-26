@@ -17,21 +17,12 @@ FROM spiketrace-incidents
 | WHERE @timestamp > NOW() - TO_TIMEDURATION(?time_window)
   AND service == ?service
   AND region == ?region
-| SORT @timestamp DESC
-| KEEP
-    @timestamp,
-    title,
-    service,
-    region,
-    severity,
-    status,
-    duration_minutes,
-    orders_affected,
-    revenue_lost_usd,
-    wasted_emissions_kg_co2e,
-    wasted_co2_grams,
-    tags
-| LIMIT 50
+| STATS
+    incident_count = COUNT(*),
+    total_orders_affected = SUM(orders_affected),
+    total_revenue_lost_usd = SUM(revenue_lost_usd),
+    total_wasted_emissions_kg_co2e = SUM(wasted_emissions_kg_co2e)
+  BY service, region
 ```
 
 ### Parameters
